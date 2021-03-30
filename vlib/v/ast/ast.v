@@ -8,20 +8,20 @@ import v.table
 import v.errors
 import v.pref
 
- pub type TypeDecl = AliasTypeDecl | FnTypeDecl | SumTypeDecl
+pub type TypeDecl = AliasTypeDecl | FnTypeDecl | SumTypeDecl
 
-pub type Expr = EmptyExpr | AnonFn | ArrayDecompose | ArrayInit | AsCast | Assoc | AtExpr | BoolLiteral |
+pub type Expr = AnonFn | ArrayDecompose | ArrayInit | AsCast | Assoc | AtExpr | BoolLiteral |
 	CTempVar | CallExpr | CastExpr | ChanInit | CharLiteral | Comment | ComptimeCall |
-	ComptimeSelector | ConcatExpr | DumpExpr | EnumVal | FloatLiteral | GoExpr | Ident |
-	IfExpr | IfGuardExpr | IndexExpr | InfixExpr | IntegerLiteral | Likely | LockExpr |
+	ComptimeSelector | ConcatExpr | DumpExpr | EmptyExpr | EnumVal | FloatLiteral | GoExpr |
+	Ident | IfExpr | IfGuardExpr | IndexExpr | InfixExpr | IntegerLiteral | Likely | LockExpr |
 	MapInit | MatchExpr | NodeError | None | OffsetOf | OrExpr | ParExpr | PostfixExpr |
 	PrefixExpr | RangeExpr | SelectExpr | SelectorExpr | SizeOf | SqlExpr | StringInterLiteral |
 	StringLiteral | StructInit | Type | TypeOf | UnsafeExpr
 
 pub type Stmt = AsmStmt | AssertStmt | AssignStmt | Block | BranchStmt | CompFor | ConstDecl |
-	DeferStmt | EnumDecl | ExprStmt | FnDecl | ForCStmt | ForInStmt | ForStmt | GlobalDecl |
-	GoStmt | GotoLabel | GotoStmt | HashStmt | Import | InterfaceDecl | Module | NodeError |
-	Return | SqlStmt | StructDecl | TypeDecl | EmptyStmt
+	DeferStmt | EmptyStmt | EnumDecl | ExprStmt | FnDecl | ForCStmt | ForInStmt | ForStmt |
+	GlobalDecl | GoStmt | GotoLabel | GotoStmt | HashStmt | Import | InterfaceDecl | Module |
+	NodeError | Return | SqlStmt | StructDecl | TypeDecl
 
 // NB: when you add a new Expr or Stmt type with a .pos field, remember to update
 // the .position() token.Position methods too.
@@ -29,8 +29,8 @@ pub type ScopeObject = AsmRegister | ConstField | GlobalField | Var
 
 // TODO: replace table.Param
 pub type Node = CallArg | ConstField | EnumField | Expr | Field | File | GlobalField |
-	IfBranch | MatchBranch | ScopeObject | SelectBranch | Stmt | StructField | StructInitField |
-	table.Param | NodeError
+	IfBranch | MatchBranch | NodeError | ScopeObject | SelectBranch | Stmt | StructField |
+	StructInitField | table.Param
 
 pub struct Type {
 pub:
@@ -38,13 +38,13 @@ pub:
 	pos token.Position
 }
 
-pub struct EmptyExpr{}
+pub struct EmptyExpr {}
 
 pub fn empty_expr() Expr {
 	return EmptyExpr{}
 }
 
-pub struct EmptyStmt{
+pub struct EmptyStmt {
 pub:
 	pos token.Position
 }

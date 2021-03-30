@@ -3389,7 +3389,7 @@ fn (mut c Checker) stmt(node ast.Stmt) {
 	}
 	// c.expected_type = table.void_type
 	match mut node {
-		ast.EmptyStmt{
+		ast.EmptyStmt {
 			print_backtrace()
 			eprintln('Checker.stmt() EmptyStmt')
 		}
@@ -3540,11 +3540,11 @@ fn (mut c Checker) for_c_stmt(node ast.ForCStmt) {
 	c.in_for_count++
 	prev_loop_label := c.loop_label
 	if node.has_init {
-c.stmt(node.init)
+		c.stmt(node.init)
 	}
 	c.expr(node.cond)
 	if node.has_inc {
-	c.stmt(node.inc)
+		c.stmt(node.inc)
 	}
 	c.check_loop_label(node.label, node.pos)
 	c.stmts(node.stmts)
@@ -3987,6 +3987,7 @@ pub fn (mut c Checker) expr(node ast.Expr) table.Type {
 	match mut node {
 		ast.NodeError {}
 		ast.EmptyExpr {
+			print_backtrace()
 			c.error('checker.expr(): unhandled EmptyExpr', token.Position{})
 		}
 		ast.CTempVar {
@@ -6216,7 +6217,9 @@ fn (mut c Checker) sql_stmt(mut node ast.SqlStmt) table.Type {
 			c.expr(expr)
 		}
 	}
-	c.expr(node.where_expr)
+	if node.where_expr !is ast.EmptyExpr {
+		c.expr(node.where_expr)
+	}
 
 	return table.void_type
 }

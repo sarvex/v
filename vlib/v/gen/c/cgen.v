@@ -1010,7 +1010,7 @@ fn (mut g Gen) stmt(node ast.Stmt) {
 	// println('g.stmt()')
 	// g.writeln('//// stmt start')
 	match node {
-		ast.EmptyStmt{}
+		ast.EmptyStmt {}
 		ast.AsmStmt {
 			g.write_v_source_line_info(node.pos)
 			g.gen_asm_stmt(node)
