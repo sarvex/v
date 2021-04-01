@@ -355,7 +355,7 @@ fn (mut g JsGen) stmts(stmts []ast.Stmt) {
 fn (mut g JsGen) stmt(node ast.Stmt) {
 	g.stmt_start_pos = g.ns.out.len
 	match node {
-		ast.EmptyStmt{}
+		ast.EmptyStmt {}
 		ast.AsmStmt {
 			panic('inline asm is not supported by js')
 		}
@@ -696,7 +696,7 @@ fn (mut g JsGen) gen_assign_stmt(stmt ast.AssignStmt) {
 			} else {
 				g.write(' $op ')
 				// TODO: Multiple types??
-				should_cast :=
+				should_cast := 
 					(g.table.type_kind(stmt.left_types.first()) in js.shallow_equatables)
 					&& (g.cast_stack.len <= 0 || stmt.left_types.first() != g.cast_stack.last())
 
