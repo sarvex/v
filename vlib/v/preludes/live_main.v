@@ -5,5 +5,5 @@ module main
 import v.live.executable
 
 const (
-	no_warning_live_executable_is_used = execuast.is_used
+	no_warning_live_executable_is_used = executable.is_used
 )
