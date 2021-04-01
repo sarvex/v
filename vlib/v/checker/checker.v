@@ -44,7 +44,7 @@ pub mut:
 	notices          []errors.Notice
 	error_lines      []int // to avoid printing multiple errors for the same line
 	expected_type    ast.Type
-	expected_or_type ast.Type  // fn() or { 'this type' } eg. string. expected or block type
+	expected_or_type ast.Type    // fn() or { 'this type' } eg. string. expected or block type
 	cur_fn           &ast.FnDecl // current function
 	const_decl       string
 	const_deps       []string
@@ -70,10 +70,10 @@ mut:
 	inside_sql                       bool // to handle sql table fields pseudo variables
 	cur_orm_ts                       ast.TypeSymbol
 	error_details                    []string
-	vmod_file_content                string       // needed for @VMOD_FILE, contents of the file, *NOT its path**
+	vmod_file_content                string     // needed for @VMOD_FILE, contents of the file, *NOT its path**
 	vweb_gen_types                   []ast.Type // vweb route checks
-	prevent_sum_type_unwrapping_once bool   // needed for assign new values to sum type, stopping unwrapping then
-	loop_label                       string // set when inside a labelled for loop
+	prevent_sum_type_unwrapping_once bool       // needed for assign new values to sum type, stopping unwrapping then
+	loop_label                       string     // set when inside a labelled for loop
 	timers                           &util.Timers = util.new_timers(false)
 	comptime_fields_type             map[string]ast.Type
 	fn_scope                         &ast.Scope = voidptr(0)
@@ -2029,8 +2029,7 @@ pub fn (mut c Checker) call_fn(mut call_expr ast.CallExpr) ast.Type {
 	} else {
 		call_expr.return_type = f.return_type
 	}
-	if f.return_type == ast.void_type && f.ctdefine.len > 0
-		&& f.ctdefine !in c.pref.compile_defines {
+	if f.return_type == ast.void_type && f.ctdefine.len > 0 && f.ctdefine !in c.pref.compile_defines {
 		call_expr.should_be_skipped = true
 	}
 	// dont check number of args for JS functions since arguments are not required
@@ -6408,8 +6407,8 @@ fn (mut c Checker) fn_decl(mut node ast.FnDecl) {
 	c.fn_scope = node.scope
 	c.stmts(node.stmts)
 	node.has_return = c.returns || has_top_return(node.stmts)
-	if node.language == .v && !node.no_body && node.return_type != ast.void_type
-		&& !node.has_return && node.name !in ['panic', 'exit'] {
+	if node.language == .v && !node.no_body && node.return_type != ast.void_type && !node.has_return
+		&& node.name !in ['panic', 'exit'] {
 		if c.inside_anon_fn {
 			c.error('missing return at the end of an anonymous function', node.pos)
 		} else {

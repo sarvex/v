@@ -27,11 +27,11 @@ pub type Stmt = AsmStmt | AssertStmt | AssignStmt | Block | BranchStmt | CompFor
 pub type ScopeObject = AsmRegister | ConstField | GlobalField | Var
 
 // TODO: replace Param
-pub type Node = CallArg | ConstField | EnumField | Expr | StructField | File | GlobalField |
-	IfBranch | MatchBranch | NodeError | ScopeObject | SelectBranch | Stmt |
-	StructInitField | Param
+pub type Node = CallArg | ConstField | EnumField | Expr | File | GlobalField | IfBranch |
+	MatchBranch | NodeError | Param | ScopeObject | SelectBranch | Stmt | StructField |
+	StructInitField
 
-pub struct TypeNode{
+pub struct TypeNode {
 pub:
 	typ Type
 	pos token.Position
@@ -132,7 +132,7 @@ pub:
 	mut_pos    token.Position
 	next_token token.Kind
 pub mut:
-	expr            Expr       // expr.field_name
+	expr            Expr // expr.field_name
 	expr_type       Type // type of `Foo` in `Foo.bar`
 	typ             Type // type of the entire thing (`Foo.bar`)
 	name_type       Type // T in `T.name` or typeof in `typeof(expr).name`
@@ -170,14 +170,14 @@ pub:
 	default_expr     Expr
 	has_default_expr bool
 	attrs            []Attr
-	is_pub bool
+	is_pub           bool
 	default_val      string
-	is_mut bool
-	is_global bool
+	is_mut           bool
+	is_global        bool
 pub mut:
 	default_expr_typ Type
-	name string
-	typ  Type
+	name             string
+	typ              Type
 }
 
 /*
@@ -199,8 +199,8 @@ pub:
 	is_pub bool
 	pos    token.Position
 pub mut:
-	typ      Type // the type of the const field, it can be any type in V
-	comments []Comment  // comments before current const field
+	typ      Type      // the type of the const field, it can be any type in V
+	comments []Comment // comments before current const field
 }
 
 // const declaration
@@ -329,7 +329,7 @@ pub struct AnonFn {
 pub mut:
 	decl    FnDecl
 	typ     Type // the type of anonymous fn. Both .typ and .decl.name are auto generated
-	has_gen bool       // has been generated
+	has_gen bool // has been generated
 }
 
 // function or method declaration
@@ -342,11 +342,11 @@ pub:
 	is_pub          bool
 	is_variadic     bool
 	is_anon         bool
-	is_manualfree   bool // true, when [manualfree] is used on a fn
-	is_main         bool // true for `fn main()`
-	is_test         bool // true for `fn test_abcde`
-	is_conditional  bool // true for `[if abc] fn abc(){}`
-	receiver        StructField // TODO this is not a struct field
+	is_manualfree   bool           // true, when [manualfree] is used on a fn
+	is_main         bool           // true for `fn main()`
+	is_test         bool           // true for `fn test_abcde`
+	is_conditional  bool           // true for `[if abc] fn abc(){}`
+	receiver        StructField    // TODO this is not a struct field
 	receiver_pos    token.Position // `(u User)` in `fn (u User) name()` position
 	is_method       bool
 	method_type_pos token.Position // `User` in ` fn (u User)` position
@@ -402,7 +402,7 @@ pub mut:
 	expected_arg_types []Type
 	language           Language
 	or_block           OrExpr
-	left               Expr       // `user` in `user.register()`
+	left               Expr // `user` in `user.register()`
 	left_type          Type // type of `user`
 	receiver_type      Type // User
 	return_type        Type
@@ -732,7 +732,7 @@ pub:
 	pos           token.Position
 	has_exception bool
 pub mut:
-	is_expr       bool       // returns a value
+	is_expr       bool // returns a value
 	expected_type Type // for debugging only
 }
 
@@ -790,8 +790,8 @@ pub mut:
 	key_type  Type
 	val_type  Type
 	cond_type Type
-	kind      Kind // array/map/string
-	label     string     // `label: for {`
+	kind      Kind   // array/map/string
+	label     string // `label: for {`
 	scope     &Scope
 }
 
@@ -884,11 +884,11 @@ pub struct EnumDecl {
 pub:
 	name             string
 	is_pub           bool
-	is_flag          bool         // true when the enum has [flag] tag,for bit field enum
-	is_multi_allowed bool         // true when the enum has [_allow_multiple_values] tag
-	comments         []Comment    // comments before the first EnumField
-	fields           []EnumField  // all the enum fields
-	attrs            []Attr // attributes of enum declaration
+	is_flag          bool        // true when the enum has [flag] tag,for bit field enum
+	is_multi_allowed bool        // true when the enum has [_allow_multiple_values] tag
+	comments         []Comment   // comments before the first EnumField
+	fields           []EnumField // all the enum fields
+	attrs            []Attr      // attributes of enum declaration
 	pos              token.Position
 }
 
@@ -1049,13 +1049,13 @@ pub:
 // `string(x,y)`, while skipping the real pointer casts like `&string(x)`.
 pub struct CastExpr {
 pub:
-	expr Expr       // `buf` in `string(buf, n)`
-	arg  Expr       // `n` in `string(buf, n)`
+	expr Expr // `buf` in `string(buf, n)`
+	arg  Expr // `n` in `string(buf, n)`
 	typ  Type // `string` TODO rename to `type_to_cast_to`
 	pos  token.Position
 pub mut:
-	typname   string     // TypeSymbol.name
-	expr_type Type // `byteptr`
+	typname   string // TypeSymbol.name
+	expr_type Type   // `byteptr`
 	has_arg   bool
 	in_prexpr bool // is the parent node an PrefixExpr
 }
@@ -1462,8 +1462,8 @@ pub fn (expr Expr) position() token.Position {
 		ChanInit, CharLiteral, ConcatExpr, Comment, ComptimeCall, ComptimeSelector, EnumVal, DumpExpr,
 		FloatLiteral, GoExpr, Ident, IfExpr, IndexExpr, IntegerLiteral, Likely, LockExpr, MapInit,
 		MatchExpr, None, OffsetOf, OrExpr, ParExpr, PostfixExpr, PrefixExpr, RangeExpr, SelectExpr,
-		SelectorExpr, SizeOf, SqlExpr, StringInterLiteral, StringLiteral, StructInit, TypeNode, TypeOf,
-		UnsafeExpr {
+		SelectorExpr, SizeOf, SqlExpr, StringInterLiteral, StringLiteral, StructInit, TypeNode,
+		TypeOf, UnsafeExpr {
 			return expr.pos
 		}
 		IfGuardExpr {
@@ -1559,10 +1559,10 @@ pub fn (stmt Stmt) check_c_expr() ? {
 // CTempVar is used in cgen only, to hold nodes for temporary variables
 pub struct CTempVar {
 pub:
-	name   string     // the name of the C temporary variable; used by g.expr(x)
-	orig   Expr       // the original expression, which produced the C temp variable; used by x.str()
-	typ    Type // the type of the original expression
-	is_ptr bool       // whether the type is a pointer
+	name   string // the name of the C temporary variable; used by g.expr(x)
+	orig   Expr   // the original expression, which produced the C temp variable; used by x.str()
+	typ    Type   // the type of the original expression
+	is_ptr bool   // whether the type is a pointer
 }
 
 pub fn (node Node) position() token.Position {
@@ -1774,7 +1774,7 @@ pub fn all_registers(mut t Table, arch pref.Arch) map[string]ScopeObject {
 	mut res := map[string]ScopeObject{}
 	match arch {
 		.amd64, .i386 {
-			for bit_size, array in x86_no_number_register_list {
+			for bit_size, array in ast.x86_no_number_register_list {
 				for name in array {
 					res[name] = AsmRegister{
 						name: name
@@ -1783,7 +1783,7 @@ pub fn all_registers(mut t Table, arch pref.Arch) map[string]ScopeObject {
 					}
 				}
 			}
-			for bit_size, array in x86_with_number_register_list {
+			for bit_size, array in ast.x86_with_number_register_list {
 				for name, max_num in array {
 					for i in 0 .. max_num {
 						hash_index := name.index('#') or {
@@ -1800,28 +1800,28 @@ pub fn all_registers(mut t Table, arch pref.Arch) map[string]ScopeObject {
 			}
 		}
 		.aarch32 {
-			aarch32 := gen_all_registers(mut t, arm_no_number_register_list, arm_with_number_register_list,
+			aarch32 := gen_all_registers(mut t, ast.arm_no_number_register_list, ast.arm_with_number_register_list,
 				32)
 			for k, v in aarch32 {
 				res[k] = v
 			}
 		}
 		.aarch64 {
-			aarch64 := gen_all_registers(mut t, arm_no_number_register_list, arm_with_number_register_list,
+			aarch64 := gen_all_registers(mut t, ast.arm_no_number_register_list, ast.arm_with_number_register_list,
 				64)
 			for k, v in aarch64 {
 				res[k] = v
 			}
 		}
 		.rv32 {
-			rv32 := gen_all_registers(mut t, riscv_no_number_register_list, riscv_with_number_register_list,
+			rv32 := gen_all_registers(mut t, ast.riscv_no_number_register_list, ast.riscv_with_number_register_list,
 				32)
 			for k, v in rv32 {
 				res[k] = v
 			}
 		}
 		.rv64 {
-			rv64 := gen_all_registers(mut t, riscv_no_number_register_list, riscv_with_number_register_list,
+			rv64 := gen_all_registers(mut t, ast.riscv_no_number_register_list, ast.riscv_with_number_register_list,
 				64)
 			for k, v in rv64 {
 				res[k] = v

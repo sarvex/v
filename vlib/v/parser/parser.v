@@ -19,9 +19,9 @@ const (
 pub struct Parser {
 	pref &pref.Preferences
 mut:
-	file_base         string // "hello.v"
-	file_name         string // "/home/user/hello.v"
-	file_name_dir     string // "/home/user"
+	file_base         string       // "hello.v"
+	file_name         string       // "/home/user/hello.v"
+	file_name_dir     string       // "/home/user"
 	file_backend_mode ast.Language // .c for .c.v|.c.vv|.c.vsh files; .js for .js.v files, .amd64/.rv32/other arches for .amd64.v/.rv32.v/etc. files, .v otherwise.
 	scanner           &scanner.Scanner
 	comments_mode     scanner.CommentsMode = .skip_comments
@@ -39,12 +39,12 @@ mut:
 	inside_fn           bool // true even with implicit main
 	inside_unsafe_fn    bool
 	inside_str_interp   bool
-	or_is_handled       bool         // ignore `or` in this expression
-	builtin_mod         bool         // are we in the `builtin` module?
-	mod                 string       // current module name
-	is_manualfree       bool         // true when `[manualfree] module abc`, makes *all* fns in the current .v file, opt out of autofree
+	or_is_handled       bool       // ignore `or` in this expression
+	builtin_mod         bool       // are we in the `builtin` module?
+	mod                 string     // current module name
+	is_manualfree       bool       // true when `[manualfree] module abc`, makes *all* fns in the current .v file, opt out of autofree
 	attrs               []ast.Attr // attributes before next decl stmt
-	expr_mod            string       // for constructing full type names in parse_type()
+	expr_mod            string     // for constructing full type names in parse_type()
 	scope               &ast.Scope
 	global_scope        &ast.Scope
 	imports             map[string]string // alias => mod_name

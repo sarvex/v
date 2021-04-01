@@ -5,7 +5,6 @@ module eval
 
 import v.ast
 import v.checker
-import v.ast
 import v.pref
 
 pub type Object = int | string
