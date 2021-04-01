@@ -4,7 +4,6 @@
 import os
 import term
 import benchmark
-import v.ast
 import v.fmt
 import v.parser
 import v.ast

@@ -1,7 +1,6 @@
 import v.ast
 import v.ast.walker
 import v.parser
-import v.ast
 import v.pref
 
 fn parse_text(text string) ast.File {

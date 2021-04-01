@@ -7,7 +7,6 @@ import benchmark
 import v.ast
 import v.fmt
 import v.parser
-import v.ast
 import v.pref
 import v.util
 
