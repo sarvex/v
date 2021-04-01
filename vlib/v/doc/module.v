@@ -3,7 +3,6 @@ module doc
 import os
 import v.ast
 import v.parser
-import v.ast
 import v.pref
 
 // get_parent_mod returns the parent mod name, in dot format.

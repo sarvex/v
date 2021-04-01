@@ -8,7 +8,6 @@ import v.fmt
 import v.parser
 import v.pref
 import v.scanner
-import v.ast
 import v.token
 
 // SymbolKind categorizes the symbols it documents.
@@ -92,7 +91,7 @@ pub struct Doc {
 pub mut:
 	prefs     &pref.Preferences = new_vdoc_preferences()
 	base_path string
-	table     &ast.Table    = &ast.Table{}
+	table     &ast.Table      = &ast.Table{}
 	checker   checker.Checker = checker.Checker{
 		table: 0
 		cur_fn: 0
