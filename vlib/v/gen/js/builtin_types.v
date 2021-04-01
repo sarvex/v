@@ -210,7 +210,7 @@ fn (mut g JsGen) struct_typ(s string) string {
 	return styp + '["prototype"]'
 }
 
-struct BuiltinPrototypeCongig {
+struct BuiltinPrototypeConfig {
 	typ_name 		string
 	val_name 		string	= 'val'
 	default_value 	string
@@ -222,8 +222,7 @@ struct BuiltinPrototypeCongig {
 	has_strfn		bool
 }
 
-// ugly arguments but not sure a config struct would be worth it
-fn (mut g JsGen) gen_builtin_prototype(c BuiltinPrototypeCongig) {
+fn (mut g JsGen) gen_builtin_prototype(c BuiltinPrototypeConfig) {
 	g.writeln('function ${c.typ_name}(${c.val_name} = ${c.default_value}) { ${c.constructor} }')
 	g.writeln('${c.typ_name}.prototype = {')
 	g.inc_indent()
