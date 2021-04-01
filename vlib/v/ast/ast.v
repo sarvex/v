@@ -1760,29 +1760,6 @@ pub fn (node Node) children() []Node {
 	return children
 }
 
-/*
-// TODO: remove this fugly hack :-|
-// fe2ex/1 and ex2fe/1 are used to convert back and forth from
-// FExpr to Expr , which in turn is needed to break
-// a dependency cycle between v.ast and v.ast, for the single
-// field Field.default_expr, which should be Expr
-pub fn fe2ex(x FExpr) Expr {
-	unsafe {
-		res := Expr{}
-		C.memcpy(&res, &x, sizeof(Expr))
-		return res
-	}
-}
-
-pub fn ex2fe(x Expr) FExpr {
-	unsafe {
-		res := FExpr{}
-		C.memcpy(&res, &x, sizeof(FExpr))
-		return res
-	}
-}
-*/
-
 // helper for dealing with `m[k1][k2][k3][k3] = value`
 pub fn (mut lx IndexExpr) recursive_mapset_is_setter(val bool) {
 	lx.is_setter = val
