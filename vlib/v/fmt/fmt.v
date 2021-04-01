@@ -5,7 +5,7 @@ module fmt
 
 import math.mathutil as mu
 import v.ast
-import v.table
+import v.ast
 import strings
 import v.util
 import v.pref
@@ -18,7 +18,7 @@ const (
 
 pub struct Fmt {
 pub mut:
-	table              &table.Table
+	table              &ast.Table
 	out_imports        strings.Builder
 	out                strings.Builder
 	indent             int
@@ -49,7 +49,7 @@ pub mut:
 	pref               &pref.Preferences
 }
 
-pub fn fmt(file ast.File, table &table.Table, pref &pref.Preferences, is_debug bool) string {
+pub fn fmt(file ast.File, table &ast.Table, pref &pref.Preferences, is_debug bool) string {
 	mut f := Fmt{
 		out: strings.new_builder(1000)
 		out_imports: strings.new_builder(200)
@@ -113,7 +113,7 @@ fn (mut f Fmt) write_indent() {
 	f.line_len += f.indent * 4
 }
 
-fn (mut f Fmt) write_language_prefix(lang table.Language) {
+fn (mut f Fmt) write_language_prefix(lang ast.Language) {
 	match lang {
 		.c { f.write('C.') }
 		.js { f.write('JS.') }
@@ -163,7 +163,7 @@ pub fn (mut f Fmt) remove_new_line(cfg RemoveNewLineConfig) {
 
 pub fn (mut f Fmt) set_current_module_name(cmodname string) {
 	f.cur_mod = cmodname
-	f.table.cmod_prefix = cmodname + '.'
+	f.ast.cmod_prefix = cmodname + '.'
 }
 
 fn (f Fmt) get_modname_prefix(mname string) (string, string) {
@@ -223,8 +223,8 @@ pub fn (mut f Fmt) short_module(name string) string {
 
 //=== Import-related methods ===//
 
-pub fn (mut f Fmt) mark_types_import_as_used(typ table.Type) {
-	sym := f.table.get_type_symbol(typ)
+pub fn (mut f Fmt) mark_types_import_as_used(typ ast.Type) {
+	sym := f.ast.get_type_symbol(typ)
 	f.mark_import_as_used(sym.name)
 }
 
@@ -867,7 +867,7 @@ pub fn (mut f Fmt) branch_stmt(node ast.BranchStmt) {
 }
 
 pub fn (mut f Fmt) comp_for(node ast.CompFor) {
-	typ := f.no_cur_mod(f.table.type_to_str_using_aliases(node.typ, f.mod2alias))
+	typ := f.no_cur_mod(f.ast.type_to_str_using_aliases(node.typ, f.mod2alias))
 	f.write('\$for $node.val_var in ${typ}.$node.kind.str() {')
 	if node.stmts.len > 0 || node.pos.line_nr < node.pos.last_line {
 		f.writeln('')
@@ -1094,7 +1094,7 @@ pub fn (mut f Fmt) global_decl(node ast.GlobalDecl) {
 		f.write(strings.repeat(` `, max - field.name.len))
 		if field.has_expr {
 			f.write('= ')
-			f.write(f.table.type_to_str_using_aliases(field.typ, f.mod2alias))
+			f.write(f.ast.type_to_str_using_aliases(field.typ, f.mod2alias))
 			f.write('(')
 			f.expr(field.expr)
 			f.write(')')
@@ -1102,7 +1102,7 @@ pub fn (mut f Fmt) global_decl(node ast.GlobalDecl) {
 			if !single && has_assign {
 				f.write('  ')
 			}
-			f.write('${f.table.type_to_str_using_aliases(field.typ, f.mod2alias)} ')
+			f.write('${f.ast.type_to_str_using_aliases(field.typ, f.mod2alias)} ')
 		}
 		if !single {
 			f.writeln('')
@@ -1150,7 +1150,7 @@ pub fn (mut f Fmt) interface_decl(node ast.InterfaceDecl) {
 			f.writeln('mut:')
 		}
 		// TODO: alignment, comments, etc.
-		mut ft := f.no_cur_mod(f.table.type_to_str_using_aliases(field.typ, f.mod2alias))
+		mut ft := f.no_cur_mod(f.ast.type_to_str_using_aliases(field.typ, f.mod2alias))
 		if !ft.contains('C.') && !ft.contains('JS.') && !ft.contains('fn (') {
 			ft = f.short_module(ft)
 		}
@@ -1198,7 +1198,7 @@ pub fn (mut f Fmt) sql_stmt(node ast.SqlStmt) {
 	f.write('sql ')
 	f.expr(node.db_expr)
 	f.writeln(' {')
-	table_name := util.strip_mod_name(f.table.get_type_symbol(node.table_expr.typ).name)
+	table_name := util.strip_mod_name(f.ast.get_type_symbol(node.table_expr.typ).name)
 	f.write('\t')
 	match node.kind {
 		.insert {
@@ -1242,7 +1242,7 @@ pub fn (mut f Fmt) alias_type_decl(node ast.AliasTypeDecl) {
 	if node.is_pub {
 		f.write('pub ')
 	}
-	ptype := f.table.type_to_str_using_aliases(node.parent_type, f.mod2alias)
+	ptype := f.ast.type_to_str_using_aliases(node.parent_type, f.mod2alias)
 	f.write('type $node.name = $ptype')
 
 	f.comments(node.comments, has_nl: false)
@@ -1252,8 +1252,8 @@ pub fn (mut f Fmt) fn_type_decl(node ast.FnTypeDecl) {
 	if node.is_pub {
 		f.write('pub ')
 	}
-	typ_sym := f.table.get_type_symbol(node.typ)
-	fn_typ_info := typ_sym.info as table.FnType
+	typ_sym := f.ast.get_type_symbol(node.typ)
+	fn_typ_info := typ_sym.info as ast.FnType
 	fn_info := fn_typ_info.func
 	fn_name := f.no_cur_mod(node.name)
 	f.write('type $fn_name = fn (')
@@ -1262,7 +1262,7 @@ pub fn (mut f Fmt) fn_type_decl(node ast.FnTypeDecl) {
 			f.write(arg.typ.share().str() + ' ')
 		}
 		f.write(arg.name)
-		mut s := f.no_cur_mod(f.table.type_to_str_using_aliases(arg.typ, f.mod2alias))
+		mut s := f.no_cur_mod(f.ast.type_to_str_using_aliases(arg.typ, f.mod2alias))
 		if arg.is_mut {
 			if s.starts_with('&') {
 				s = s[1..]
@@ -1285,8 +1285,8 @@ pub fn (mut f Fmt) fn_type_decl(node ast.FnTypeDecl) {
 		}
 	}
 	f.write(')')
-	if fn_info.return_type.idx() != table.void_type_idx {
-		ret_str := f.no_cur_mod(f.table.type_to_str_using_aliases(fn_info.return_type,
+	if fn_info.return_type.idx() != ast.void_type_idx {
+		ret_str := f.no_cur_mod(f.ast.type_to_str_using_aliases(fn_info.return_type,
 			f.mod2alias))
 		f.write(' $ret_str')
 	} else if fn_info.return_type.has_flag(.optional) {
@@ -1303,7 +1303,7 @@ pub fn (mut f Fmt) sum_type_decl(node ast.SumTypeDecl) {
 	f.write('type $node.name = ')
 	mut sum_type_names := []string{}
 	for t in node.variants {
-		sum_type_names << f.table.type_to_str_using_aliases(t.typ, f.mod2alias)
+		sum_type_names << f.ast.type_to_str_using_aliases(t.typ, f.mod2alias)
 	}
 	sum_type_names.sort()
 	for i, name in sum_type_names {
@@ -1327,10 +1327,10 @@ pub fn (mut f Fmt) array_decompose(node ast.ArrayDecompose) {
 }
 
 pub fn (mut f Fmt) array_init(node ast.ArrayInit) {
-	if node.exprs.len == 0 && node.typ != 0 && node.typ != table.void_type {
+	if node.exprs.len == 0 && node.typ != 0 && node.typ != ast.void_type {
 		// `x := []string{}`
 		f.mark_types_import_as_used(node.typ)
-		f.write(f.table.type_to_str_using_aliases(node.typ, f.mod2alias))
+		f.write(f.ast.type_to_str_using_aliases(node.typ, f.mod2alias))
 		f.write('{')
 		if node.has_len {
 			f.write('len: ')
@@ -1476,7 +1476,7 @@ pub fn (mut f Fmt) array_init(node ast.ArrayInit) {
 			f.write('!')
 			return
 		}
-		f.write(f.table.type_to_str_using_aliases(node.elem_type, f.mod2alias))
+		f.write(f.ast.type_to_str_using_aliases(node.elem_type, f.mod2alias))
 		if node.has_default {
 			f.write('{init: ')
 			f.expr(node.default_expr)
@@ -1495,7 +1495,7 @@ fn should_decrease_arr_penalty(e ast.Expr) bool {
 }
 
 pub fn (mut f Fmt) as_cast(node ast.AsCast) {
-	type_str := f.table.type_to_str_using_aliases(node.typ, f.mod2alias)
+	type_str := f.ast.type_to_str_using_aliases(node.typ, f.mod2alias)
 	f.expr(node.expr)
 	f.write(' as $type_str')
 }
@@ -1522,7 +1522,7 @@ pub fn (mut f Fmt) call_expr(node ast.CallExpr) {
 	f.use_short_fn_args = false
 	if node.args.len > 0 && node.args.last().expr is ast.StructInit {
 		struct_expr := node.args.last().expr as ast.StructInit
-		if struct_expr.typ == table.void_type {
+		if struct_expr.typ == ast.void_type {
 			f.use_short_fn_args = true
 		}
 	}
@@ -1581,7 +1581,7 @@ fn (mut f Fmt) write_generic_if_require(node ast.CallExpr) {
 		f.write('<')
 		for i, generic_type in node.generic_types {
 			is_last := i == node.generic_types.len - 1
-			f.write(f.table.type_to_str(generic_type))
+			f.write(f.ast.type_to_str(generic_type))
 			if !is_last {
 				f.write(', ')
 			}
@@ -1610,7 +1610,7 @@ pub fn (mut f Fmt) call_args(args []ast.CallArg) {
 }
 
 pub fn (mut f Fmt) cast_expr(node ast.CastExpr) {
-	f.write(f.table.type_to_str_using_aliases(node.typ, f.mod2alias) + '(')
+	f.write(f.ast.type_to_str_using_aliases(node.typ, f.mod2alias) + '(')
 	f.expr(node.expr)
 	if node.has_arg {
 		f.write(', ')
@@ -1620,7 +1620,7 @@ pub fn (mut f Fmt) cast_expr(node ast.CastExpr) {
 }
 
 pub fn (mut f Fmt) chan_init(mut node ast.ChanInit) {
-	info := f.table.get_type_symbol(node.typ).chan_info()
+	info := f.ast.get_type_symbol(node.typ).chan_info()
 	if node.elem_type == 0 && node.typ > 0 {
 		node.elem_type = info.elem_type
 	}
@@ -1634,7 +1634,7 @@ pub fn (mut f Fmt) chan_init(mut node ast.ChanInit) {
 	if is_mut {
 		f.write('mut ')
 	}
-	f.write(f.table.type_to_str_using_aliases(el_typ, f.mod2alias))
+	f.write(f.ast.type_to_str_using_aliases(el_typ, f.mod2alias))
 	f.write('{')
 	if node.has_cap {
 		f.write('cap: ')
@@ -1997,9 +1997,9 @@ pub fn (mut f Fmt) lock_expr(node ast.LockExpr) {
 
 pub fn (mut f Fmt) map_init(node ast.MapInit) {
 	if node.keys.len == 0 {
-		if node.typ > table.void_type {
+		if node.typ > ast.void_type {
 			f.mark_types_import_as_used(node.typ)
-			f.write(f.table.type_to_str_using_aliases(node.typ, f.mod2alias))
+			f.write(f.ast.type_to_str_using_aliases(node.typ, f.mod2alias))
 		} else {
 			// m = map{}
 			f.write('map')
@@ -2095,7 +2095,7 @@ pub fn (mut f Fmt) match_expr(node ast.MatchExpr) {
 }
 
 pub fn (mut f Fmt) offset_of(node ast.OffsetOf) {
-	f.write('__offsetof(${f.table.type_to_str(node.struct_type)}, $node.field)')
+	f.write('__offsetof(${f.ast.type_to_str(node.struct_type)}, $node.field)')
 }
 
 pub fn (mut f Fmt) or_expr(node ast.OrExpr) {
@@ -2209,7 +2209,7 @@ pub fn (mut f Fmt) selector_expr(node ast.SelectorExpr) {
 pub fn (mut f Fmt) size_of(node ast.SizeOf) {
 	f.write('sizeof(')
 	if node.is_type {
-		f.write(f.table.type_to_str_using_aliases(node.typ, f.mod2alias))
+		f.write(f.ast.type_to_str_using_aliases(node.typ, f.mod2alias))
 	} else {
 		f.expr(node.expr)
 	}
@@ -2222,7 +2222,7 @@ pub fn (mut f Fmt) sql_expr(node ast.SqlExpr) {
 	f.expr(node.db_expr)
 	f.writeln(' {')
 	f.write('\tselect ')
-	table_name := util.strip_mod_name(f.table.get_type_symbol(node.table_expr.typ).name)
+	table_name := util.strip_mod_name(f.ast.get_type_symbol(node.table_expr.typ).name)
 	if node.is_count {
 		f.write('count ')
 	} else {
@@ -2261,7 +2261,7 @@ pub fn (mut f Fmt) string_literal(node ast.StringLiteral) {
 	use_double_quote := node.val.contains("'") && !node.val.contains('"')
 	if node.is_raw {
 		f.write('r')
-	} else if node.language == table.Language.c {
+	} else if node.language == ast.Language.c {
 		f.write('c')
 	}
 	if node.is_raw {
@@ -2316,7 +2316,7 @@ pub fn (mut f Fmt) string_inter_literal(node ast.StringInterLiteral) {
 }
 
 pub fn (mut f Fmt) type_expr(node ast.Type) {
-	f.write(f.table.type_to_str(node.typ))
+	f.write(f.ast.type_to_str(node.typ))
 }
 
 pub fn (mut f Fmt) type_of(node ast.TypeOf) {
@@ -2350,7 +2350,7 @@ pub fn (mut f Fmt) prefix_expr_cast_expr(node ast.Expr) {
 	if node is ast.PrefixExpr {
 		if node.right is ast.CastExpr && node.op == .amp {
 			mut ce := node.right as ast.CastExpr
-			ce.typname = f.table.get_type_symbol(ce.typ).name
+			ce.typname = f.ast.get_type_symbol(ce.typ).name
 			is_pe_amp_ce = true
 			f.expr(ce)
 		}

@@ -1,11 +1,11 @@
 import v.ast
 import v.ast.walker
 import v.parser
-import v.table
+import v.ast
 import v.pref
 
 fn parse_text(text string) ast.File {
-	tbl := table.new_table()
+	tbl := ast.new_table()
 	prefs := pref.new_preferences()
 	scope := &ast.Scope{
 		parent: 0

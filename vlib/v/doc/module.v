@@ -1,7 +1,7 @@
 module doc
 
 import os
-import v.table
+import v.ast
 import v.parser
 import v.ast
 import v.pref
@@ -40,7 +40,7 @@ fn get_parent_mod(input_dir string) ?string {
 		}
 		return error('No V files found.')
 	}
-	tbl := table.new_table()
+	tbl := ast.new_table()
 	scope := &ast.Scope{
 		parent: 0
 	}

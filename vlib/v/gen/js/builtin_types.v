@@ -1,5 +1,5 @@
 module js
-import v.table
+import v.ast
 
 fn (mut g JsGen) to_js_typ_def_val(s string) string {
 	mut dval := ''
@@ -13,7 +13,7 @@ fn (mut g JsGen) to_js_typ_def_val(s string) string {
 	return dval
 }
 
-fn (mut g JsGen) to_js_typ_val(t table.Type) string {
+fn (mut g JsGen) to_js_typ_val(t ast.Type) string {
 	sym := g.table.get_type_symbol(t)
 	mut styp := ''
 	mut prefix := if g.file.mod.name == 'builtin' { 'new ' } else { '' } 
@@ -44,7 +44,7 @@ fn (mut g JsGen) to_js_typ_val(t table.Type) string {
 	return styp
 }
 
-fn (mut g JsGen) sym_to_js_typ(sym table.TypeSymbol) string {
+fn (mut g JsGen) sym_to_js_typ(sym ast.TypeSymbol) string {
 	mut styp := ''
 	match sym.kind {
 		.i8 { styp = 'i8' }
@@ -73,7 +73,7 @@ fn (mut g JsGen) sym_to_js_typ(sym table.TypeSymbol) string {
 }
 
 // V type to JS type
-pub fn (mut g JsGen) typ(t table.Type) string {
+pub fn (mut g JsGen) typ(t ast.Type) string {
 	sym := g.table.get_type_symbol(t)
 	mut styp := ''
 	match sym.kind {
@@ -104,11 +104,11 @@ pub fn (mut g JsGen) typ(t table.Type) string {
 		}
 		// 'array_array_int' => 'number[][]'
 		.array {
-			info := sym.info as table.Array
+			info := sym.info as ast.Array
 			styp = '${g.sym_to_js_typ(sym)}(${g.typ(info.elem_type)})'
 		}
 		.array_fixed {
-			info := sym.info as table.ArrayFixed
+			info := sym.info as ast.ArrayFixed
 			styp = '${g.sym_to_js_typ(sym)}(${g.typ(info.elem_type)})'
 		}
 		.chan {
@@ -116,7 +116,7 @@ pub fn (mut g JsGen) typ(t table.Type) string {
 		}
 		// 'map[string]int' => 'Map<string, number>'
 		.map {
-			info := sym.info as table.Map
+			info := sym.info as ast.Map
 			key := g.typ(info.key_type)
 			val := g.typ(info.value_type)
 			styp = 'Map<$key, $val>'
@@ -131,7 +131,7 @@ pub fn (mut g JsGen) typ(t table.Type) string {
 		.generic_struct_inst {}
 		// 'multi_return_int_int' => '[number, number]'
 		.multi_return {
-			info := sym.info as table.MultiReturn
+			info := sym.info as ast.MultiReturn
 			types := info.types.map(g.typ(it))
 			joined := types.join(', ')
 			styp = '[$joined]'
@@ -153,7 +153,7 @@ pub fn (mut g JsGen) typ(t table.Type) string {
 		}
 		// 'anon_fn_7_7_1' => '(a number, b number) => void'
 		.function {
-			info := sym.info as table.FnType
+			info := sym.info as ast.FnType
 			styp = g.fn_typ(info.func.params, info.func.return_type)
 		}
 		.interface_ {
@@ -181,7 +181,7 @@ pub fn (mut g JsGen) typ(t table.Type) string {
 	return styp
 }
 
-fn (mut g JsGen) fn_typ(args []table.Param, return_type table.Type) string {
+fn (mut g JsGen) fn_typ(args []ast.Param, return_type ast.Type) string {
 	mut res := '('
 	for i, arg in args {
 		res += '$arg.name: ${g.typ(arg.typ)}'

@@ -104,7 +104,7 @@ pub fn (mut f Fmt) struct_decl(node ast.StructDecl) {
 	f.write(name)
 	if node.gen_types.len > 0 {
 		f.write('<')
-		gtypes := node.gen_types.map(f.table.type_to_str(it)).join(', ')
+		gtypes := node.gen_types.map(f.ast.type_to_str(it)).join(', ')
 		f.write(gtypes)
 		f.write('>')
 	}
@@ -118,7 +118,7 @@ pub fn (mut f Fmt) struct_decl(node ast.StructDecl) {
 	mut default_expr_aligns := []CommentAndExprAlignInfo{}
 	mut field_types := []string{cap: node.fields.len}
 	for i, field in node.fields {
-		ft := f.no_cur_mod(f.table.type_to_str_using_aliases(field.typ, f.mod2alias))
+		ft := f.no_cur_mod(f.ast.type_to_str_using_aliases(field.typ, f.mod2alias))
 		field_types << ft
 		attrs_len := inline_attrs_len(field.attrs)
 		end_pos := field.pos.pos + field.pos.len
@@ -141,7 +141,7 @@ pub fn (mut f Fmt) struct_decl(node ast.StructDecl) {
 	}
 	for embed in node.embeds {
 		f.mark_types_import_as_used(embed.typ)
-		styp := f.table.type_to_str_using_aliases(embed.typ, f.mod2alias)
+		styp := f.ast.type_to_str_using_aliases(embed.typ, f.mod2alias)
 		f.writeln('\t$styp')
 	}
 	mut field_align_i := 0
@@ -253,7 +253,7 @@ pub fn (mut f Fmt) struct_init(node ast.StructInit) {
 		f.is_struct_init = struct_init_save
 	}
 
-	type_sym := f.table.get_type_symbol(node.typ)
+	type_sym := f.ast.get_type_symbol(node.typ)
 	// f.write('<old name: $type_sym.name>')
 	mut name := type_sym.name
 	if !name.starts_with('C.') {
