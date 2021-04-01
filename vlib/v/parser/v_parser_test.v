@@ -3,10 +3,8 @@ module parser
 // import v.eval
 import v.ast
 import v.gen.c
-import v.ast
 import v.checker
 import v.pref
-import v.scanner
 import term
 
 fn test_eval() {
