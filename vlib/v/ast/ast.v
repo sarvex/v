@@ -27,8 +27,8 @@ pub type Stmt = AsmStmt | AssertStmt | AssignStmt | Block | BranchStmt | CompFor
 pub type ScopeObject = AsmRegister | ConstField | GlobalField | Var
 
 // TODO: replace Param
-pub type Node = CallArg | ConstField | EnumField | Expr | File | GlobalField | IfBranch |
-	MatchBranch | NodeError | Param | ScopeObject | SelectBranch | Stmt | StructField |
+pub type Node = CallArg | ConstField | EmptyNode | EnumField | Expr | File | GlobalField |
+	IfBranch | MatchBranch | NodeError | Param | ScopeObject | SelectBranch | Stmt | StructField |
 	StructInitField
 
 pub struct TypeNode {
@@ -52,6 +52,14 @@ pub:
 
 pub fn empty_stmt() Stmt {
 	return EmptyStmt{}
+}
+
+pub struct EmptyNode {
+	x int
+}
+
+pub fn empty_node() Node {
+	return EmptyNode{}
 }
 
 // `{stmts}` or `unsafe {stmts}`
@@ -1568,6 +1576,9 @@ pub:
 pub fn (node Node) position() token.Position {
 	match node {
 		NodeError {
+			return token.Position{}
+		}
+		EmptyNode {
 			return token.Position{}
 		}
 		Stmt {
