@@ -84,7 +84,7 @@ fn (mut p Parser) struct_decl() ast.StructDecl {
 		name = p.prepend_mod(name)
 	}
 	mut ast_fields := []ast.StructField{}
-	//mut fields := []ast.Field{}
+	mut fields := []ast.StructField{}
 	mut embed_types := []ast.Type{}
 	mut embeds := []ast.Embed{}
 	mut embed_field_names := []string{}
@@ -253,20 +253,6 @@ fn (mut p Parser) struct_decl() ast.StructDecl {
 					has_default_expr = true
 					comments << p.eat_comments({})
 				}
-			}
-			/*
-			// save embeds as table fields too, it will be used in generation phase
-			fields << ast.Field{
-				name: field_name
-				typ: typ
-				default_expr: ast.ex2fe(default_expr)
-				has_default_expr: has_default_expr
-				is_pub: is_pub_field
-				is_mut: is_mut_field
-				is_global: is_field_global
-				attrs: p.attrs
-			}
-			*/
 				ast_fields << ast.StructField{
 					name: field_name
 					typ: typ
@@ -277,9 +263,24 @@ fn (mut p Parser) struct_decl() ast.StructDecl {
 					has_default_expr: has_default_expr
 					attrs: p.attrs
 					is_pub: is_embed || is_field_pub
+					is_mut: is_embed || is_field_mut
+					is_global: is_field_global
+				}
+			}
+			// save embeds as table fields too, it will be used in generation phase
+			fields << ast.StructField{
+				name: field_name
+				typ: typ
+				pos: field_pos
+				type_pos: type_pos
+				comments: comments
+				default_expr: default_expr
+				has_default_expr: has_default_expr
+				attrs: p.attrs
+				is_pub: is_embed || is_field_pub
 				is_mut: is_embed || is_field_mut
 				is_global: is_field_global
-				}
+			}
 			p.attrs = []
 		}
 		p.top_level_statement_end()
@@ -294,7 +295,7 @@ fn (mut p Parser) struct_decl() ast.StructDecl {
 		mod: p.mod
 		info: ast.Struct{
 			embeds: embed_types
-			fields: ast_fields
+			fields: fields
 			is_typedef: attrs.contains('typedef')
 			is_union: is_union
 			is_heap: attrs.contains('heap')
