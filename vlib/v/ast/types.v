@@ -883,7 +883,7 @@ pub fn (t &Table) type_to_str_using_aliases(typ Type, import_aliases map[string]
 			}
 		}
 		.map {
-			if int(t) == ast.map_type_idx {
+			if int(typ) == ast.map_type_idx {
 				return 'map'
 			}
 			info := sym.info as Map
