@@ -2,7 +2,7 @@
 # build with: docker build tests/autobahn/. -t myimage
 # use in act: act -P ubuntu-latest=myimage
 
-FROM node:12.6-buster-slim
+FROM node:12.22-buster-slim
 
 COPY config/fuzzingserver.json /config/fuzzingserver.json
 RUN chmod +775 /config/fuzzingserver.json
